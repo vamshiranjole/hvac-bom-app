@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BOM Results</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-6">
+
+  <div class="max-w-5xl mx-auto">
+
+    <!-- Header -->
+    <h1 class="text-2xl font-bold text-gray-800 mb-1">BOM Results</h1>
+    <p class="text-sm text-gray-500 mb-6">Extracted from: <span class="font-medium text-gray-700">sample_hvac.pdf</span></p>
+
+    <!-- Progress Bar -->
+    <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+      <div class="flex items-center justify-between">
+
+        <div class="flex flex-col items-center text-xs text-gray-400">
+          <div class="w-7 h-7 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold mb-1">✓</div>
+          Queued
+        </div>
+
+        <div class="flex-1 h-1 bg-green-200 mx-1"></div>
+
+        <div class="flex flex-col items-center text-xs text-gray-400">
+          <div class="w-7 h-7 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold mb-1">✓</div>
+          Reading PDF
+        </div>
+
+        <div class="flex-1 h-1 bg-green-200 mx-1"></div>
+
+        <div class="flex flex-col items-center text-xs text-gray-400">
+          <div class="w-7 h-7 rounded-full bg-green-100 text-green-600 flex items-center justify-center font-bold mb-1">✓</div>
+          Running AI
+        </div>
+
+        <div class="flex-1 h-1 bg-green-200 mx-1"></div>
+
+        <div class="flex flex-col items-center text-xs text-blue-500 font-semibold">
+          <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mb-1">4</div>
+          Checking Rules
+        </div>
+
+        <div class="flex-1 h-1 bg-gray-200 mx-1"></div>
+
+        <div class="flex flex-col items-center text-xs text-gray-400">
+          <div class="w-7 h-7 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold mb-1">5</div>
+          Done
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Summary Strip -->
+    <div class="flex gap-4 mb-6">
+      <div class="bg-white rounded-xl shadow-sm px-5 py-3 flex items-center gap-2">
+        <span class="text-2xl font-bold text-gray-800">12</span>
+        <span class="text-sm text-gray-500">items found</span>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm px-5 py-3 flex items-center gap-2">
+        <span class="text-2xl font-bold text-yellow-500">3</span>
+        <span class="text-sm text-gray-500">need review</span>
+      </div>
+      <div class="bg-white rounded-xl shadow-sm px-5 py-3 flex items-center gap-2">
+        <span class="text-2xl font-bold text-red-500">2</span>
+        <span class="text-sm text-gray-500">issues</span>
+      </div>
+    </div>
+
+    <!-- BOM Table -->
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
+          <tr>
+            <th class="px-4 py-3 text-left">Tag</th>
+            <th class="px-4 py-3 text-left">Type</th>
+            <th class="px-4 py-3 text-left">Manufacturer</th>
+            <th class="px-4 py-3 text-left">Model</th>
+            <th class="px-4 py-3 text-left">Qty</th>
+            <th class="px-4 py-3 text-left">Capacity</th>
+            <th class="px-4 py-3 text-left">Voltage</th>
+            <th class="px-4 py-3 text-left">Confidence</th>
+            <th class="px-4 py-3 text-left">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+
+          <tr class="bg-[#D1FAE5]">
+            <td class="px-4 py-3 font-medium">AHU-1</td>
+            <td class="px-4 py-3">Air Handler</td>
+            <td class="px-4 py-3">Trane</td>
+            <td class="px-4 py-3">CLCD-SVX01A</td>
+            <td class="px-4 py-3">1</td>
+            <td class="px-4 py-3">10 Ton</td>
+            <td class="px-4 py-3">460V</td>
+            <td class="px-4 py-3">98%</td>
+            <td class="px-4 py-3"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs">auto_approved</span></td>
+          </tr>
+
+          <tr class="bg-[#FEF9C3]">
+            <td class="px-4 py-3 font-medium">FCU-3</td>
+            <td class="px-4 py-3">Fan Coil</td>
+            <td class="px-4 py-3">Carrier</td>
+            <td class="px-4 py-3">42CE-018</td>
+            <td class="px-4 py-3">2</td>
+            <td class="px-4 py-3">1.5 Ton</td>
+            <td class="px-4 py-3">208V</td>
+            <td class="px-4 py-3">74%</td>
+            <td class="px-4 py-3"><span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs">likely_ok</span></td>
+          </tr>
+
+          <tr class="bg-[#FFEDD5]">
+            <td class="px-4 py-3 font-medium">RTU-2</td>
+            <td class="px-4 py-3">Rooftop Unit</td>
+            <td class="px-4 py-3">Lennox</td>
+            <td class="px-4 py-3">KGA-120</td>
+            <td class="px-4 py-3">1</td>
+            <td class="px-4 py-3">10 Ton</td>
+            <td class="px-4 py-3">230V</td>
+            <td class="px-4 py-3">61%</td>
+            <td class="px-4 py-3"><span class="bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-xs">needs_review</span></td>
+          </tr>
+
+          <tr class="bg-[#FEE2E2]">
+            <td class="px-4 py-3 font-medium">CH-1</td>
+            <td class="px-4 py-3">Chiller</td>
+            <td class="px-4 py-3">York</td>
+            <td class="px-4 py-3">YCAS-0130</td>
+            <td class="px-4 py-3">1</td>
+            <td class="px-4 py-3">130 Ton</td>
+            <td class="px-4 py-3">480V</td>
+            <td class="px-4 py-3">42%</td>
+            <td class="px-4 py-3"><span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs">manual_required</span></td>
+          </tr>
+
+          <tr class="bg-[#D1FAE5]">
+            <td class="px-4 py-3 font-medium">CT-1</td>
+            <td class="px-4 py-3">Cooling Tower</td>
+            <td class="px-4 py-3">Evapco</td>
+            <td class="px-4 py-3">AT-162</td>
+            <td class="px-4 py-3">1</td>
+            <td class="px-4 py-3">160 Ton</td>
+            <td class="px-4 py-3">460V</td>
+            <td class="px-4 py-3">95%</td>
+            <td class="px-4 py-3"><span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs">auto_approved</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex gap-3 mb-4">
+      <button disabled class="bg-blue-500 text-white px-5 py-2 rounded-lg text-sm font-semibold opacity-50 cursor-not-allowed">Download Excel</button>
+      <button disabled class="bg-gray-700 text-white px-5 py-2 rounded-lg text-sm font-semibold opacity-50 cursor-not-allowed">Send to Salesforce</button>
+    </div>
+
+    <!-- Compare Link -->
+    <a href="#" class="text-sm text-blue-500 hover:underline">Compare with another version →</a>
+
+  </div>
+</body>
+</html>
