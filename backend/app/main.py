@@ -1,12 +1,14 @@
 import uuid
 import hashlib
+import redis
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from rq import Queue
 from app.config import settings
 from app.services.pdf_store import store_pdf
 from app.services.job_store import create_job, get_job
+from app.workers.tasks import process_pdf_job
 from app.routers import jobs
-import redis
 
 app = FastAPI(title="HVAC BOM Extractor")
 
@@ -19,7 +21,9 @@ app.add_middleware(
 
 app.include_router(jobs.router)
 
+redis_conn = redis.from_url(settings.REDIS_URL)
 r = redis.from_url(settings.REDIS_URL, decode_responses=True)
+q = Queue(connection=redis_conn)
 
 @app.get("/health")
 def health():
@@ -45,5 +49,7 @@ async def upload_pdf(file: UploadFile = File(...)):
     store_pdf(job_id, pdf_bytes)
     create_job(job_id, file.filename, document_hash)
     r.setex(f"hash:{document_hash}", settings.RESULT_TTL_SECONDS, job_id)
+
+    q.enqueue(process_pdf_job, job_id)
 
     return {"job_id": job_id, "status": "queued", "filename": file.filename, "document_hash": document_hash}
