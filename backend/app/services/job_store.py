@@ -1,7 +1,7 @@
-import json
 import redis
 from datetime import datetime
 from app.config import settings
+import json
 
 r = redis.from_url(settings.REDIS_URL, decode_responses=True)
 
@@ -23,3 +23,9 @@ def get_job(job_id: str):
 
 def update_job_status(job_id: str, new_status: str):
     r.hset(f"job:{job_id}", "status", new_status)
+
+def update_job_page_count(job_id: str, page_count: int):
+    r.hset(f"job:{job_id}", "page_count", page_count)
+
+def store_result(job_id: str, result: dict):
+    r.setex(f"result:{job_id}", settings.RESULT_TTL_SECONDS, json.dumps(result))
