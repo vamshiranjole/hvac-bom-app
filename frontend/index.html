@@ -52,14 +52,34 @@
     const fileNameEl = document.getElementById("file-name");
     const extractBtn = document.getElementById("extractBtn");
 
+    const API_URL = "https://hvac-bom-app-production.up.railway.app";
+    let selectedFile = null;
+
     function handleFile(file) {
       if (file && file.type === "application/pdf") {
+        selectedFile = file;
         fileNameEl.textContent = file.name;
         extractBtn.disabled = false;
         extractBtn.classList.remove("opacity-40", "cursor-not-allowed");
-        alert("PDF selected: " + file.name);
       }
     }
+
+    extractBtn.addEventListener("click", async () => {
+      if (!selectedFile) return;
+      extractBtn.textContent = "Uploading...";
+      extractBtn.disabled = true;
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      try {
+        const res = await fetch(`${API_URL}/upload`, {method: "POST", body: formData});
+        const data = await res.json();
+        window.location.href = `results.html?job=${data.job_id}`;
+      } catch (err) {
+        alert("Upload failed: " + err.message);
+        extractBtn.textContent = "Extract BOM";
+        extractBtn.disabled = false;
+      }
+    });
 
     dropZone.addEventListener("dragover", (e) => {
       e.preventDefault();
