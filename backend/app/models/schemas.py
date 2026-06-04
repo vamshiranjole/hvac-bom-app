@@ -11,3 +11,4 @@ class EquipmentItem(BaseModel):
     voltage: Optional[str] = None
     source_page: Optional[int] = None
     low_confidence: Optional[bool] = False
+    confidence_score: Optional[float] = None
