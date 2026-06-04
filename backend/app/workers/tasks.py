@@ -4,6 +4,9 @@ sys.path.insert(0, "/content/hvac-bom-app/backend")
 from app.services.pdf_store import read_pdf, delete_pdf
 from app.services.job_store import update_job_status, update_job_page_count, store_result
 from app.services.pdf_parser import combine_page_content
+from app.services.ai_extractor import extract_equipment
+from app.services.rules_engine import run_r_rules, run_h_rules
+from app.services.bom_builder import build_bom
 
 def process_pdf_job(job_id: str):
     try:
@@ -17,12 +20,26 @@ def process_pdf_job(job_id: str):
         pages = combine_page_content(pdf_bytes)
         update_job_page_count(job_id, len(pages))
 
-        store_result(job_id, {
-            "pages": len(pages),
-            "items": [],
-            "issues": []
-        })
+        all_items = []
+        for page in pages:
+            items = extract_equipment(page["content"], page["page_number"])
+            all_items += items
 
+        items_scored = all_items
+
+        r_issues = run_r_rules(items_scored)
+        h_issues = run_h_rules(items_scored)
+
+        bom = build_bom(items_scored, r_issues + h_issues)
+
+        result = {
+            "bom": bom,
+            "issues": r_issues + h_issues,
+            "page_count": len(pages),
+            "item_count": len(bom)
+        }
+
+        store_result(job_id, result)
         update_job_status(job_id, "complete")
 
     except Exception as e:
