@@ -22,15 +22,15 @@ def process_pdf_job(job_id: str):
 
         all_items = []
         for page in pages:
-            items = extract_equipment(page["content"], page["page_number"])
+            content = page["content"].strip()
+            if len(content) < 50:
+                continue
+            items = extract_equipment(content, page["page_number"])
             all_items += items
 
-        items_scored = all_items
-
-        r_issues = run_r_rules(items_scored)
-        h_issues = run_h_rules(items_scored)
-
-        bom = build_bom(items_scored, r_issues + h_issues)
+        r_issues = run_r_rules(all_items)
+        h_issues = run_h_rules(all_items)
+        bom = build_bom(all_items, r_issues + h_issues)
 
         result = {
             "bom": bom,
