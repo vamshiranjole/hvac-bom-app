@@ -8,6 +8,8 @@ from app.services.ai_extractor import extract_equipment
 from app.services.rules_engine import run_r_rules, run_h_rules
 from app.services.bom_builder import build_bom
 
+MAX_PAGES_TO_PROCESS = 10
+
 def process_pdf_job(job_id: str):
     try:
         update_job_status(job_id, "processing")
@@ -21,12 +23,16 @@ def process_pdf_job(job_id: str):
         update_job_page_count(job_id, len(pages))
 
         all_items = []
+        processed = 0
         for page in pages:
+            if processed >= MAX_PAGES_TO_PROCESS:
+                break
             content = page["content"].strip()
             if len(content) < 50:
                 continue
             items = extract_equipment(content, page["page_number"])
             all_items += items
+            processed += 1
 
         r_issues = run_r_rules(all_items)
         h_issues = run_h_rules(all_items)
