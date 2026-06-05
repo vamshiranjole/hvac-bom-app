@@ -86,7 +86,7 @@
 
     <!-- Buttons -->
     <div class="flex gap-3 mb-4">
-      <button disabled class="bg-blue-500 text-white px-5 py-2 rounded-lg text-sm font-semibold opacity-50 cursor-not-allowed">Download Excel</button>
+      <button id="downloadBtn" onclick="window.open(`https://hvac-bom-app-production.up.railway.app/jobs/${jobId}/download`)" class="bg-blue-500 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition">Download Excel</button>
       <button disabled class="bg-gray-700 text-white px-5 py-2 rounded-lg text-sm font-semibold opacity-50 cursor-not-allowed">Send to Salesforce</button>
     </div>
 
