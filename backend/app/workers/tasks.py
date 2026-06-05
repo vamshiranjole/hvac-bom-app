@@ -8,7 +8,7 @@ from app.services.ai_extractor import extract_equipment
 from app.services.rules_engine import run_r_rules, run_h_rules
 from app.services.bom_builder import build_bom
 
-MAX_PAGES_TO_PROCESS = 10
+MAX_PAGES_TO_PROCESS = 5
 
 def process_pdf_job(job_id: str):
     try:
