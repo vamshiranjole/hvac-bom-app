@@ -9,6 +9,11 @@ from app.services.pdf_store import store_pdf
 from app.services.job_store import create_job, get_job
 from app.workers.tasks import process_pdf_job
 from app.routers import jobs
+from app.services.pdf_parser import combine_page_content
+from app.services.ai_extractor import extract_equipment
+from app.services.rules_engine import run_r_rules, run_h_rules
+from app.services.bom_builder import build_bom
+from app.services.revision_compare import compare_boms
 
 app = FastAPI(title="HVAC BOM Extractor")
 
@@ -53,3 +58,28 @@ async def upload_pdf(file: UploadFile = File(...)):
     q.enqueue(process_pdf_job, job_id)
 
     return {"job_id": job_id, "status": "queued", "filename": file.filename, "document_hash": document_hash}
+
+@app.post("/compare")
+async def compare_pdfs(file_old: UploadFile = File(...), file_new: UploadFile = File(...)):
+    old_bytes = await file_old.read()
+    new_bytes = await file_new.read()
+
+    def process(pdf_bytes):
+        pages = combine_page_content(pdf_bytes)
+        all_items = []
+        for page in pages[:5]:
+            content = page["content"].strip()
+            if len(content) < 50:
+                continue
+            items = extract_equipment(content, page["page_number"])
+            all_items += items
+        r_issues = run_r_rules(all_items)
+        h_issues = run_h_rules(all_items)
+        bom = build_bom(all_items, r_issues + h_issues)
+        return bom
+
+    old_bom = process(old_bytes)
+    new_bom = process(new_bytes)
+    changes = compare_boms(old_bom, new_bom)
+
+    return {"changes": changes, "total_changes": len(changes)}

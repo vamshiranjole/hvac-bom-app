@@ -7,50 +7,35 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 min-h-screen p-6">
-
   <div class="max-w-5xl mx-auto">
-
-    <!-- Header -->
     <h1 class="text-2xl font-bold text-gray-800 mb-1">Compare BOM Versions</h1>
     <p class="text-sm text-gray-500 mb-6">Upload two versions of an equipment schedule to see what changed.</p>
 
-    <!-- Two Upload Zones -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
+    <div id="error-msg" class="hidden bg-red-100 text-red-700 px-4 py-3 rounded-lg mb-4"></div>
 
-      <!-- Old Version -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
       <div>
         <p class="text-sm font-medium text-gray-700 mb-2">Old Version <span class="text-gray-400">(e.g. Issue 1)</span></p>
-        <div id="drop-old"
-          class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition"
-          onclick="document.getElementById('fileOld').click()">
+        <div id="drop-old" class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition" onclick="document.getElementById('fileOld').click()">
           <p class="text-gray-400 text-sm">Drag & drop or click to browse</p>
           <p class="text-blue-500 text-sm font-medium mt-1 break-all" id="name-old"></p>
         </div>
         <input type="file" accept=".pdf" id="fileOld" class="hidden"/>
       </div>
-
-      <!-- New Version -->
       <div>
         <p class="text-sm font-medium text-gray-700 mb-2">New Version <span class="text-gray-400">(e.g. Issue 2)</span></p>
-        <div id="drop-new"
-          class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition"
-          onclick="document.getElementById('fileNew').click()">
+        <div id="drop-new" class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition" onclick="document.getElementById('fileNew').click()">
           <p class="text-gray-400 text-sm">Drag & drop or click to browse</p>
           <p class="text-blue-500 text-sm font-medium mt-1 break-all" id="name-new"></p>
         </div>
         <input type="file" accept=".pdf" id="fileNew" class="hidden"/>
       </div>
-
     </div>
 
-    <!-- Compare Button -->
     <div class="flex justify-center mb-8">
-      <button class="bg-blue-500 text-white font-semibold px-10 py-2 rounded-lg hover:bg-blue-600 transition">
-        Compare
-      </button>
+      <button id="compareBtn" onclick="runCompare()" class="bg-blue-500 text-white font-semibold px-10 py-2 rounded-lg hover:bg-blue-600 transition">Compare</button>
     </div>
 
-    <!-- Results Table -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-gray-50 text-gray-500 uppercase text-xs">
@@ -62,77 +47,82 @@
             <th class="px-4 py-3 text-left">New Value</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
-
-          <!-- Added Row (Green) -->
-          <tr class="bg-[#D1FAE5]">
-            <td class="px-4 py-3">
-              <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium">added</span>
-            </td>
-            <td class="px-4 py-3 font-medium">FCU-5</td>
-            <td class="px-4 py-3">—</td>
-            <td class="px-4 py-3 text-gray-400">—</td>
-            <td class="px-4 py-3">Fan Coil, Carrier, 42CE-024</td>
-          </tr>
-
-          <!-- Removed Row (Red) -->
-          <tr class="bg-[#FEE2E2]">
-            <td class="px-4 py-3">
-              <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">removed</span>
-            </td>
-            <td class="px-4 py-3 font-medium">RTU-3</td>
-            <td class="px-4 py-3">—</td>
-            <td class="px-4 py-3">Rooftop Unit, Lennox, KGA-090</td>
-            <td class="px-4 py-3 text-gray-400">—</td>
-          </tr>
-
-          <!-- Modified Row (Yellow) -->
-          <tr class="bg-[#FEF9C3]">
-            <td class="px-4 py-3">
-              <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs font-medium">modified</span>
-            </td>
-            <td class="px-4 py-3 font-medium">AHU-1</td>
-            <td class="px-4 py-3">Capacity</td>
-            <td class="px-4 py-3">10 Ton</td>
-            <td class="px-4 py-3">15 Ton</td>
-          </tr>
-
+        <tbody id="compare-tbody" class="divide-y divide-gray-100">
+          <tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">Upload two PDFs and click Compare.</td></tr>
         </tbody>
       </table>
     </div>
-
   </div>
 
   <script>
+    const API_URL = "https://hvac-bom-app-production.up.railway.app";
+
     function setupZone(zoneId, inputId, nameId) {
       const zone = document.getElementById(zoneId);
       const input = document.getElementById(inputId);
       const nameEl = document.getElementById(nameId);
-
-      input.addEventListener("change", () => {
-        if (input.files[0]) nameEl.textContent = input.files[0].name;
-      });
-
-      zone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        zone.classList.add("border-blue-400", "bg-blue-50");
-      });
-
-      zone.addEventListener("dragleave", () => {
-        zone.classList.remove("border-blue-400", "bg-blue-50");
-      });
-
+      input.addEventListener("change", () => { if (input.files[0]) nameEl.textContent = input.files[0].name; });
+      zone.addEventListener("dragover", (e) => { e.preventDefault(); zone.classList.add("border-blue-400", "bg-blue-50"); });
+      zone.addEventListener("dragleave", () => { zone.classList.remove("border-blue-400", "bg-blue-50"); });
       zone.addEventListener("drop", (e) => {
         e.preventDefault();
         zone.classList.remove("border-blue-400", "bg-blue-50");
         const file = e.dataTransfer.files[0];
-        if (file) nameEl.textContent = file.name;
+        if (file) { document.getElementById(inputId).files = e.dataTransfer.files; nameEl.textContent = file.name; }
       });
     }
 
     setupZone("drop-old", "fileOld", "name-old");
     setupZone("drop-new", "fileNew", "name-new");
-  </script>
 
+    async function runCompare() {
+      const fileOld = document.getElementById("fileOld").files[0];
+      const fileNew = document.getElementById("fileNew").files[0];
+      if (!fileOld || !fileNew) { alert("Please select both PDF files!"); return; }
+
+      const btn = document.getElementById("compareBtn");
+      btn.textContent = "Comparing...";
+      btn.disabled = true;
+
+      const formData = new FormData();
+      formData.append("file_old", fileOld);
+      formData.append("file_new", fileNew);
+
+      try {
+        const res = await fetch(`${API_URL}/compare`, { method: "POST", body: formData });
+        const data = await res.json();
+        renderChanges(data.changes);
+      } catch (err) {
+        document.getElementById("error-msg").textContent = "Compare failed: " + err.message;
+        document.getElementById("error-msg").classList.remove("hidden");
+      }
+
+      btn.textContent = "Compare";
+      btn.disabled = false;
+    }
+
+    function renderChanges(changes) {
+      const tbody = document.getElementById("compare-tbody");
+      tbody.innerHTML = "";
+      if (!changes.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400">No changes found!</td></tr>';
+        return;
+      }
+      const colorMap = { added: "#D1FAE5", removed: "#FEE2E2", modified: "#FEF9C3" };
+      const badgeMap = { added: "bg-green-100 text-green-700", removed: "bg-red-100 text-red-700", modified: "bg-yellow-100 text-yellow-700" };
+      changes.forEach(change => {
+        const tr = document.createElement("tr");
+        tr.style.background = colorMap[change.change_type] || "white";
+        tr.innerHTML = `
+          <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-medium ${badgeMap[change.change_type]}">${change.change_type}</span></td>
+          <td class="px-4 py-3 font-medium">${change.equipment_tag || "-"}</td>
+          <td class="px-4 py-3">${change.field || "-"}</td>
+          <td class="px-4 py-3">${change.old_value || "-"}</td>
+          <td class="px-4 py-3">${change.new_value || "-"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
 </body>
 </html>
