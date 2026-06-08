@@ -67,7 +67,7 @@ async def compare_pdfs(file_old: UploadFile = File(...), file_new: UploadFile = 
     def process(pdf_bytes):
         pages = combine_page_content(pdf_bytes)
         all_items = []
-        for page in pages[:5]:
+        for page in pages[:3]:
             content = page["content"].strip()
             if len(content) < 50:
                 continue
