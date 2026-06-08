@@ -117,8 +117,8 @@
           <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-xs font-medium ${badgeMap[change.change_type]}">${change.change_type}</span></td>
           <td class="px-4 py-3 font-medium">${change.equipment_tag || "-"}</td>
           <td class="px-4 py-3">${change.field || "-"}</td>
-          <td class="px-4 py-3">${change.old_value || "-"}</td>
-          <td class="px-4 py-3">${change.new_value || "-"}</td>
+          <td class="px-4 py-3">${change.old_value && typeof change.old_value === 'object' ? change.old_value.equipment_type || JSON.stringify(change.old_value) : change.old_value || "-"}</td>
+          <td class="px-4 py-3">${change.new_value && typeof change.new_value === 'object' ? change.new_value.equipment_type || JSON.stringify(change.new_value) : change.new_value || "-"}</td>
         `;
         tbody.appendChild(tr);
       });
