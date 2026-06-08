@@ -9,11 +9,6 @@ from app.services.pdf_store import store_pdf
 from app.services.job_store import create_job, get_job
 from app.workers.tasks import process_pdf_job
 from app.routers import jobs
-from app.services.pdf_parser import combine_page_content
-from app.services.ai_extractor import extract_equipment
-from app.services.rules_engine import run_r_rules, run_h_rules
-from app.services.bom_builder import build_bom
-from app.services.revision_compare import compare_boms
 
 app = FastAPI(title="HVAC BOM Extractor")
 
@@ -61,25 +56,29 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 @app.post("/compare")
 async def compare_pdfs(file_old: UploadFile = File(...), file_new: UploadFile = File(...)):
+    import json
+    from app.services.revision_compare import compare_boms
+
     old_bytes = await file_old.read()
     new_bytes = await file_new.read()
 
-    def process(pdf_bytes):
-        pages = combine_page_content(pdf_bytes)
-        all_items = []
-        for page in pages[:3]:
-            content = page["content"].strip()
-            if len(content) < 50:
-                continue
-            items = extract_equipment(content, page["page_number"])
-            all_items += items
-        r_issues = run_r_rules(all_items)
-        h_issues = run_h_rules(all_items)
-        bom = build_bom(all_items, r_issues + h_issues)
-        return bom
+    old_hash = "sha256:" + hashlib.sha256(old_bytes).hexdigest()
+    new_hash = "sha256:" + hashlib.sha256(new_bytes).hexdigest()
 
-    old_bom = process(old_bytes)
-    new_bom = process(new_bytes)
+    old_job_id = r.get(f"hash:{old_hash}")
+    new_job_id = r.get(f"hash:{new_hash}")
+
+    if not old_job_id or not new_job_id:
+        return {"error": "Please upload both PDFs via /upload first and wait for them to complete."}
+
+    old_result_raw = r.get(f"result:{old_job_id}")
+    new_result_raw = r.get(f"result:{new_job_id}")
+
+    if not old_result_raw or not new_result_raw:
+        return {"error": "Results not ready yet. Please wait for both jobs to complete."}
+
+    old_bom = json.loads(old_result_raw).get("bom", [])
+    new_bom = json.loads(new_result_raw).get("bom", [])
+
     changes = compare_boms(old_bom, new_bom)
-
     return {"changes": changes, "total_changes": len(changes)}
