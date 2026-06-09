@@ -87,7 +87,18 @@
     <!-- Buttons -->
     <div class="flex gap-3 mb-4">
       <button id="downloadBtn" onclick="window.open(`https://hvac-bom-app-production.up.railway.app/jobs/${jobId}/download`)" class="bg-blue-500 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-600 transition">Download Excel</button>
-      <button disabled class="bg-gray-700 text-white px-5 py-2 rounded-lg text-sm font-semibold opacity-50 cursor-not-allowed">Send to Salesforce</button>
+      <button onclick="sendToSalesforce()" class="bg-gray-700 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition">Send to Salesforce</button>
+
+<div id="sf-form" class="hidden mt-4 bg-white border rounded-xl p-4 max-w-md">
+  <p class="text-sm font-medium text-gray-700 mb-3">Salesforce Credentials</p>
+  <input id="sf-project" type="text" placeholder="Project Name" class="w-full border rounded-lg px-3 py-2 text-sm mb-2"/>
+  <input id="sf-user" type="text" placeholder="Salesforce Username" class="w-full border rounded-lg px-3 py-2 text-sm mb-2"/>
+  <input id="sf-pass" type="password" placeholder="Password" class="w-full border rounded-lg px-3 py-2 text-sm mb-2"/>
+  <input id="sf-token" type="text" placeholder="Security Token" class="w-full border rounded-lg px-3 py-2 text-sm mb-2"/>
+  <input id="sf-url" type="text" placeholder="Instance URL https://aquarient-agentforce.my.salesforce.com" class="w-full border rounded-lg px-3 py-2 text-sm mb-3"/>
+  <button onclick="submitToSalesforce()" class="w-full bg-blue-500 text-white py-2 rounded-lg text-sm font-semibold hover:bg-blue-600">Submit</button>
+  <p id="sf-result" class="text-sm text-green-600 mt-2 hidden"></p>
+</div>
     </div>
 
     <a href="compare.html" class="text-sm text-blue-500 hover:underline">Compare with another version →</a>
@@ -95,5 +106,34 @@
   </div>
 
   <script src="js/results.js"></script>
+<script>
+function sendToSalesforce() {
+    document.getElementById("sf-form").classList.toggle("hidden");
+}
+
+async function submitToSalesforce() {
+    const payload = {
+        job_id: jobId,
+        project_name: document.getElementById("sf-project").value,
+        sf_username: document.getElementById("sf-user").value,
+        sf_password: document.getElementById("sf-pass").value,
+        sf_token: document.getElementById("sf-token").value,
+        sf_instance_url: document.getElementById("sf-url").value
+    };
+    try {
+        const res = await fetch(`${API_URL}/salesforce/push`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        const el = document.getElementById("sf-result");
+        el.textContent = "✅ Pushed! View opportunity: " + data.opportunity_url;
+        el.classList.remove("hidden");
+    } catch (err) {
+        alert("Failed: " + err.message);
+    }
+}
+</script>
 </body>
 </html>
