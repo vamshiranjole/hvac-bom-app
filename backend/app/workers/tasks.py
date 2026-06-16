@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, "/content/hvac-bom-app/backend")
+sys.path.insert(0, "/app")
 
 from app.services.pdf_store import read_pdf, delete_pdf
 from app.services.job_store import update_job_status, update_job_page_count, store_result
