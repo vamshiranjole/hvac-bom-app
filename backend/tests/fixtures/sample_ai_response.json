@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "equipment_tag": "RTU-1",
+      "equipment_type": "Rooftop Unit",
+      "manufacturer": "Carrier",
+      "model_number": "48XP024",
+      "quantity": 1,
+      "capacity": "7.5 ton",
+      "voltage": "460V",
+      "low_confidence": false
+    },
+    {
+      "equipment_tag": "AHU-1",
+      "equipment_type": "Air Handling Unit",
+      "manufacturer": "Trane",
+      "model_number": "CSAA012",
+      "quantity": 1,
+      "capacity": "5 ton",
+      "voltage": "208V",
+      "low_confidence": false
+    }
+  ]
+}
