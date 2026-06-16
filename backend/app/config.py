@@ -4,6 +4,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str
     OPENAI_MODEL: str = "gpt-4o"
     REDIS_URL: str
+    API_KEY: str
     MAX_PDF_BYTES: int = 26214400
     PDF_TTL_SECONDS: int = 1800
     RESULT_TTL_SECONDS: int = 604800
