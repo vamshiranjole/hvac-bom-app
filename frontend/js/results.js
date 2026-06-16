@@ -3,7 +3,7 @@ const API_URL = "https://hvac-bom-app-production.up.railway.app";
 const jobId = new URLSearchParams(window.location.search).get("job");
 
 function checkStatus() {
-    fetch(`${API_URL}/jobs/${jobId}`)
+    fetch(`${API_URL}/jobs/${jobId}`, {headers: {"x-api-key": "hvac2024securekey123456789abc"}})
         .then(res => res.json())
         .then(data => {
             updateProgress(data.status);
@@ -40,7 +40,7 @@ function updateProgress(status) {
 }
 
 function fetchResult() {
-    fetch(`${API_URL}/jobs/${jobId}/result`)
+    fetch(`${API_URL}/jobs/${jobId}/result`, {headers: {"x-api-key": "hvac2024securekey123456789abc"}})
         .then(res => res.json())
         .then(data => {
             renderBOM(data);
