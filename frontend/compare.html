@@ -91,7 +91,12 @@
       try {
         const res = await fetch(`${API_URL}/compare`, { method: "POST", body: formData, headers: {"x-api-key": "hvac2024securekey123456789abc"} });
         const data = await res.json();
-        renderChanges(data.changes);
+        if (data.error) {
+          document.getElementById("error-msg").textContent = "Compare failed: " + data.error;
+          document.getElementById("error-msg").classList.remove("hidden");
+        } else {
+          renderChanges(data.changes);
+        }
       } catch (err) {
         document.getElementById("error-msg").textContent = "Compare failed: " + err.message;
         document.getElementById("error-msg").classList.remove("hidden");
