@@ -128,7 +128,15 @@ async function submitToSalesforce() {
         });
         const data = await res.json();
         const el = document.getElementById("sf-result");
-        el.textContent = "✅ Pushed! View opportunity: " + data.opportunity_url;
+        if (data.opportunity_url) {
+          el.textContent = "✅ Pushed! View opportunity: " + data.opportunity_url;
+        } else if (data.detail) {
+          el.textContent = "❌ Failed: " + data.detail;
+          el.style.color = "red";
+        } else {
+          el.textContent = "❌ Unexpected response: " + JSON.stringify(data);
+          el.style.color = "red";
+        }
         el.classList.remove("hidden");
     } catch (err) {
         alert("Failed: " + err.message);
