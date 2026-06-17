@@ -89,7 +89,7 @@
       formData.append("file_new", fileNew);
 
       try {
-        const res = await fetch(`${API_URL}/compare`, { method: "POST", body: formData });
+        const res = await fetch(`${API_URL}/compare`, { method: "POST", body: formData, headers: {"x-api-key": "hvac2024securekey123456789abc"} });
         const data = await res.json();
         renderChanges(data.changes);
       } catch (err) {
